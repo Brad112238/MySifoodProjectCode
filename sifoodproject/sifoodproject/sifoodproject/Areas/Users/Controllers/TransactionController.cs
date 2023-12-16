@@ -46,7 +46,7 @@ namespace sifoodproject.Areas.Users.Controllers
         public IQueryable<CheckOutVM> GetCheckoutData()
         {
             string userId = _userIdentityService.GetUserId();
-            var CheckOutData = _context.Carts.Include(x => x.User).Where(y => y.UserId == userId && y.Product.IsDelete == 1 &&
+            var checkOutData = _context.Carts.Include(x => x.User).Where(y => y.UserId == userId && y.Product.IsDelete == 1 &&
             y.Product.RealeasedTime.Date == DateTime.Now.Date && y.Product.SuggestPickEndTime > DateTime.Now.TimeOfDay 
             && y.Product.ReleasedQty - y.Product.OrderedQty !=0)
             .Select(y => new CheckOutVM
@@ -65,15 +65,15 @@ namespace sifoodproject.Areas.Users.Controllers
                 StoreName = _context.Stores.Where(s => s.StoreId == y.Product.StoreId).Select(p => p.StoreName).Single(),
                 PhotoPath = _context.Products.Where(p => p.ProductId == y.ProductId).Select(c => c.PhotoPath).Single(),
             });
-            return CheckOutData;
+            return checkOutData;
         }
 
         [HttpPost]
         [Route("/Transaction/TakeOutOrder")]
         public string TakeOutOrder([FromBody] CreateTakeOutOrderVM model)
         {
-            string StoreId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
-            string UserId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
+            string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
+            string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
             User? user = _context.Users.FirstOrDefault(x => x.UserName == model.UserName);
             user.TotalOrderAmount += model.TotalPrice;
             TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
@@ -82,8 +82,8 @@ namespace sifoodproject.Areas.Users.Controllers
             Order order = new()
             {
                 OrderDate = taiwanTime,
-                StoreId = StoreId,
-                UserId = UserId,
+                StoreId = storeId,
+                UserId = userId,
                 DeliveryMethod = "自取",
                 StatusId = 1,
                 TotalPrice = model.TotalPrice
@@ -111,7 +111,7 @@ namespace sifoodproject.Areas.Users.Controllers
                 PaymentStatusＮame = "未付款",
                 PaymentTime = DateTime.Now,
             };
-            List<Cart> cartItems = _context.Carts.Where(c => c.UserId == UserId).ToList();
+            List<Cart> cartItems = _context.Carts.Where(c => c.UserId == userId).ToList();
             _context.Carts.RemoveRange(cartItems);
             _context.Payments.Add(payment);
             _context.SaveChanges();
@@ -128,8 +128,8 @@ namespace sifoodproject.Areas.Users.Controllers
         [Route("/Transaction/DeliverOrder")]
         public string DeliverOrder([FromBody] CreateDeliverOrderVM model)
         {
-            string StoreId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
-            string UserId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
+            string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
+            string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
             User? user = _context.Users.FirstOrDefault(x => x.UserName == model.UserName);
             user.TotalOrderAmount += model.TotalPrice;
             TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
@@ -138,8 +138,8 @@ namespace sifoodproject.Areas.Users.Controllers
             Order order = new()
             {
                 OrderDate = taiwanTime,
-                StoreId = StoreId,
-                UserId = UserId,
+                StoreId = storeId,
+                UserId = userId,
                 DeliveryMethod = "外送",
                 StatusId = 1,
                 TotalPrice = model.TotalPrice,
@@ -169,7 +169,7 @@ namespace sifoodproject.Areas.Users.Controllers
                 PaymentStatusＮame = "未付款",
                 PaymentTime = DateTime.Now,
             };
-            List<Cart> cartItems = _context.Carts.Where(c => c.UserId == UserId).ToList();
+            List<Cart> cartItems = _context.Carts.Where(c => c.UserId == userId).ToList();
             _context.Carts.RemoveRange(cartItems);
             _context.Payments.Add(payment);
             _context.SaveChanges();
@@ -189,7 +189,7 @@ namespace sifoodproject.Areas.Users.Controllers
                 MerchantID = inModel.MerchantID,
                 Version = "2.0"
             };
-            List<KeyValuePair<string, string>> TradeInfo = new()
+            List<KeyValuePair<string, string>> tradeInfo = new()
             {
             new("MerchantID", inModel.MerchantID),
             new("RespondType", "String"),
@@ -203,12 +203,12 @@ namespace sifoodproject.Areas.Users.Controllers
             new("ClientBackURL", inModel.ClientBackURL),
             new("EmailModify", "1")
             };
-            string TradeInfoParam = string.Join("&", TradeInfo.Select(x => $"{x.Key}={x.Value}"));
-            string HashKey = _configuration.GetSection("HashKey").Value;
-            string HashIV = _configuration.GetSection("HashIV").Value;
-            string TradeInfoEncrypt = EncryptAESHex(TradeInfoParam, HashKey, HashIV);
-            outModel.TradeInfo = TradeInfoEncrypt;
-            outModel.TradeSha = EncryptSHA256($"HashKey={HashKey}&{TradeInfoEncrypt}&HashIV={HashIV}");
+            string tradeInfoParam = string.Join("&", tradeInfo.Select(x => $"{x.Key}={x.Value}"));
+            string hashKey = _configuration.GetSection("HashKey").Value;
+            string hashIV = _configuration.GetSection("HashIV").Value;
+            string tradeInfoEncrypt = EncryptAESHex(tradeInfoParam, hashKey, hashIV);
+            outModel.TradeInfo = tradeInfoEncrypt;
+            outModel.TradeSha = EncryptSHA256($"HashKey={hashKey}&{tradeInfoEncrypt}&HashIV={hashIV}");
             return Json(outModel);
         }
 

@@ -27,9 +27,9 @@ namespace sifoodproject.Areas.Admin.Controllers
             if (admin != null)
             {
                 string passwordWithSalt = $"{model.Password}{admin.PasswordSalt}";
-                Byte[] RealPasswordBytes = Encoding.ASCII.GetBytes(passwordWithSalt);
-                Byte[] RealPasswordHash = SHA256.HashData(RealPasswordBytes);
-                if (Enumerable.SequenceEqual(RealPasswordHash, admin.Password))
+                Byte[] realPasswordBytes = Encoding.ASCII.GetBytes(passwordWithSalt);
+                Byte[] realPasswordHash = SHA256.HashData(realPasswordBytes);
+                if (Enumerable.SequenceEqual(realPasswordHash, admin.Password))
                 {
                     return RedirectToAction("Index", "OrderManage");
                 }

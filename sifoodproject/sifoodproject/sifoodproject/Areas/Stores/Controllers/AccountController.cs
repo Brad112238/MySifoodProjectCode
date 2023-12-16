@@ -36,9 +36,9 @@ namespace sifoodproject.Areas.Stores.Controllers
             if (account != null)
             {
                 string passwordWithSalt = $"{model.SetPassword}{account.PasswordSalt}";
-                Byte[] RealPasswordBytes = Encoding.ASCII.GetBytes(passwordWithSalt);
-                Byte[] RealPasswordHash = SHA256.HashData(RealPasswordBytes);
-                if (Enumerable.SequenceEqual(RealPasswordHash, account.PasswordHash))
+                Byte[] realPasswordBytes = Encoding.ASCII.GetBytes(passwordWithSalt);
+                Byte[] realPasswordHash = SHA256.HashData(realPasswordBytes);
+                if (Enumerable.SequenceEqual(realPasswordHash, account.PasswordHash))
                 {
                     List<Claim> claims = new()
                         {
