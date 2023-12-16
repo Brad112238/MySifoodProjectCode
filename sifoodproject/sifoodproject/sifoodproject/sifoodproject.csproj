@@ -27,7 +27,6 @@
     <Folder Include="Areas\Drivers\Views\" />
     <Folder Include="Areas\Stores\Controllers\" />
     <Folder Include="Areas\Stores\Views\" />
-    <Folder Include="Areas\Users\Models\" />
     <Folder Include="Areas\Users\Views\" />
   </ItemGroup>
 
