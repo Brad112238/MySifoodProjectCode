@@ -14,16 +14,6 @@ namespace sifoodproject.Areas.Drivers.Controllers
         {
             _context = context;
         }
-        public IActionResult OrderList()
-        {
-            return View();
-        }
-        [Route("/Drivers/Home/ChooseOrder/{OrderId}")]
-        public IActionResult ChooseOrder(string OrderId)
-        {
-            var orderdetail = _context.Orders.Where(o => o.StatusId == 2 && o.OrderId == OrderId);
-            return View(orderdetail);
-        }
 
         public IActionResult FinishOrder()
         {

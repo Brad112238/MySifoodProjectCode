@@ -22,17 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Views\Home\" />
-    <Folder Include="Areas\Admin\Views\MemberManage\" />
-    <Folder Include="Areas\Admin\Views\OrderManage\" />
     <Folder Include="Areas\Admin\Views\StoreManage\" />
-    <Folder Include="Areas\Drivers\Data\" />
     <Folder Include="Areas\Drivers\Views\" />
     <Folder Include="Areas\Stores\Controllers\" />
-    <Folder Include="Areas\Stores\Data\" />
     <Folder Include="Areas\Stores\Views\" />
-    <Folder Include="Areas\Users\Data\" />
     <Folder Include="Areas\Users\Models\" />
     <Folder Include="Areas\Users\Views\" />
   </ItemGroup>
