@@ -70,7 +70,7 @@ namespace sifoodproject.Areas.Users.Controllers
 
         [HttpPost]
         [Route("/Transaction/TakeOutOrder")]
-        public string TakeOutOrder([FromBody] CreateTakeOutOrderVM model)
+        public string TakeOutOrder([FromBody]CreateTakeOutOrderVM model)
         {
             string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
             string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
@@ -126,7 +126,7 @@ namespace sifoodproject.Areas.Users.Controllers
 
         [HttpPost]
         [Route("/Transaction/DeliverOrder")]
-        public string DeliverOrder([FromBody] CreateDeliverOrderVM model)
+        public string DeliverOrder([FromBody]CreateDeliverOrderVM model)
         {
             string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
             string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
@@ -181,7 +181,7 @@ namespace sifoodproject.Areas.Users.Controllers
         /// </summary>
         [HttpPost]
         [Route("/Transaction/SendToNewebPay")]
-        public JsonResult SendToNewebPay([FromForm] SendToNewebPayIn inModel)
+        public JsonResult SendToNewebPay([FromForm]SendToNewebPayIn inModel)
         {
             string orderId = _context.Orders.Include(o => o.User).Where(o => o.User.UserName == inModel.UserName).OrderBy(o => o.OrderId).Select(o => o.OrderId).LastOrDefault().ToString();
             SendToNewebPayOut outModel = new()

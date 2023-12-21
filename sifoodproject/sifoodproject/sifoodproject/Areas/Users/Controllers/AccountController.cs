@@ -41,8 +41,8 @@ namespace sifoodproject.Areas.Users.Controllers
                     emailAccount.UserLatestLogInDate = DateTime.UtcNow;
                     List<Claim> claims = new()
                         {
-                        new(ClaimTypes.Name, $"{emailAccount.UserId}"),
-                        new(ClaimTypes.Role, "User"),
+                            new(ClaimTypes.Name, $"{emailAccount.UserId}"),
+                            new(ClaimTypes.Role, "User"),
                         };
                     ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     ClaimsPrincipal principal = new(identity);
@@ -179,7 +179,7 @@ namespace sifoodproject.Areas.Users.Controllers
                 return "驗證碼核對成功";
             }
             else
-            {         
+            {
                 return "驗證碼核對失敗";
             }
         }
