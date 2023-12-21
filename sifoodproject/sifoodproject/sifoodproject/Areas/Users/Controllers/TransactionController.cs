@@ -45,7 +45,7 @@ namespace sifoodproject.Areas.Users.Controllers
         [Route("/Transaction/GetCheckoutData")]
         public IQueryable<CheckOutVM> GetCheckoutData()
         {
-            string userId = _userIdentityService.GetUserId();
+            string? userId = _userIdentityService.GetUserId();
             var checkOutData = _context.Carts.Include(x => x.User).Where(y => y.UserId == userId && y.Product.IsDelete == 1 &&
             y.Product.RealeasedTime.Date == DateTime.Now.Date && y.Product.SuggestPickEndTime > DateTime.Now.TimeOfDay 
             && y.Product.ReleasedQty - y.Product.OrderedQty !=0)
@@ -72,8 +72,8 @@ namespace sifoodproject.Areas.Users.Controllers
         [Route("/Transaction/TakeOutOrder")]
         public string TakeOutOrder([FromBody]CreateTakeOutOrderVM model)
         {
-            string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
-            string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
+            string? storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
+            string? userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
             User? user = _context.Users.FirstOrDefault(x => x.UserName == model.UserName);
             user.TotalOrderAmount += model.TotalPrice;
             TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
@@ -128,8 +128,8 @@ namespace sifoodproject.Areas.Users.Controllers
         [Route("/Transaction/DeliverOrder")]
         public string DeliverOrder([FromBody]CreateDeliverOrderVM model)
         {
-            string storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
-            string userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
+            string? storeId = _context.Stores.Where(s => s.StoreName == model.StoreName).Select(s => s.StoreId).Single();
+            string? userId = _context.Users.Where(x => x.UserName == model.UserName).Select(x => x.UserId).Single();
             User? user = _context.Users.FirstOrDefault(x => x.UserName == model.UserName);
             user.TotalOrderAmount += model.TotalPrice;
             TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
@@ -183,7 +183,7 @@ namespace sifoodproject.Areas.Users.Controllers
         [Route("/Transaction/SendToNewebPay")]
         public JsonResult SendToNewebPay([FromForm]SendToNewebPayIn inModel)
         {
-            string orderId = _context.Orders.Include(o => o.User).Where(o => o.User.UserName == inModel.UserName).OrderBy(o => o.OrderId).Select(o => o.OrderId).LastOrDefault().ToString();
+            string? orderId = _context.Orders.Include(o => o.User).Where(o => o.User.UserName == inModel.UserName).OrderBy(o => o.OrderId).Select(o => o.OrderId).LastOrDefault().ToString();
             SendToNewebPayOut outModel = new()
             {
                 MerchantID = inModel.MerchantID,
@@ -203,10 +203,10 @@ namespace sifoodproject.Areas.Users.Controllers
             new("ClientBackURL", inModel.ClientBackURL),
             new("EmailModify", "1")
             };
-            string tradeInfoParam = string.Join("&", tradeInfo.Select(x => $"{x.Key}={x.Value}"));
-            string hashKey = _configuration.GetSection("HashKey").Value;
-            string hashIV = _configuration.GetSection("HashIV").Value;
-            string tradeInfoEncrypt = EncryptAESHex(tradeInfoParam, hashKey, hashIV);
+            string? tradeInfoParam = string.Join("&", tradeInfo.Select(x => $"{x.Key}={x.Value}"));
+            string? hashKey = _configuration.GetSection("HashKey").Value;
+            string? hashIV = _configuration.GetSection("HashIV").Value;
+            string? tradeInfoEncrypt = EncryptAESHex(tradeInfoParam, hashKey, hashIV);
             outModel.TradeInfo = tradeInfoEncrypt;
             outModel.TradeSha = EncryptSHA256($"HashKey={hashKey}&{tradeInfoEncrypt}&HashIV={hashIV}");
             return Json(outModel);
@@ -223,9 +223,9 @@ namespace sifoodproject.Areas.Users.Controllers
         /// </summary>
         public IActionResult CallbackReturn(CallBackVM model)
         {
-            string hashKey = _configuration.GetSection("HashKey").Value;
-            string hashIV = _configuration.GetSection("HashIV").Value;
-            string decryptedTradeInfo = DecryptAESHex(model.TradeInfo, hashKey, hashIV);
+            string? hashKey = _configuration.GetSection("HashKey").Value;
+            string? hashIV = _configuration.GetSection("HashIV").Value;
+            string? decryptedTradeInfo = DecryptAESHex(model.TradeInfo, hashKey, hashIV);
             var keyValuePairs = decryptedTradeInfo.Split('&').Select(part => part.Split('=')).ToDictionary(split => split[0], split => split[1]);
             model.Status = keyValuePairs["Status"];
             model.MerchantOrderNo = keyValuePairs["MerchantOrderNo"];
@@ -247,9 +247,9 @@ namespace sifoodproject.Areas.Users.Controllers
         /// </summary>
         public IActionResult CallbackNotify(CallBackVM model)
         {
-            string hashKey = _configuration.GetSection("HashKey").Value;
-            string hashIV = _configuration.GetSection("HashIV").Value;
-            string decryptedTradeInfo = DecryptAESHex(model.TradeInfo, hashKey, hashIV);
+            string? hashKey = _configuration.GetSection("HashKey").Value;
+            string? hashIV = _configuration.GetSection("HashIV").Value;
+            string? decryptedTradeInfo = DecryptAESHex(model.TradeInfo, hashKey, hashIV);
             var keyValuePairs = decryptedTradeInfo.Split('&').Select(part => part.Split('=')).ToDictionary(split => split[0], split => split[1]);
             model.Status = keyValuePairs["Status"];
             model.MerchantOrderNo = keyValuePairs["MerchantOrderNo"];
@@ -274,7 +274,7 @@ namespace sifoodproject.Areas.Users.Controllers
         /// <param name="cryptoIV">cryptoIV</param>
         public string EncryptAESHex(string source, string cryptoKey, string cryptoIV)
         {
-            string result = string.Empty;
+            string? result = string.Empty;
             if (!string.IsNullOrEmpty(source))
             {
                 var encryptValue = EncryptAES(Encoding.UTF8.GetBytes(source), cryptoKey, cryptoIV);
@@ -311,7 +311,7 @@ namespace sifoodproject.Areas.Users.Controllers
         /// <param name="source">加密前字串</param>
         public string EncryptSHA256(string source)
         {
-            string result = string.Empty;
+            string? result = string.Empty;
             using (System.Security.Cryptography.SHA256 algorithm = System.Security.Cryptography.SHA256.Create())
             {
                 var hash = algorithm.ComputeHash(Encoding.UTF8.GetBytes(source));
@@ -331,7 +331,7 @@ namespace sifoodproject.Areas.Users.Controllers
         /// <param name="cryptoIV">cryptoIV</param>
         public string DecryptAESHex(string source, string cryptoKey, string cryptoIV)
         {
-            string result = string.Empty;
+            string? result = string.Empty;
             if (!string.IsNullOrEmpty(source))
             {
                 byte[] sourceBytes = ToByteArray(source);
